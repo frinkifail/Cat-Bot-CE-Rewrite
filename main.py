@@ -1,13 +1,20 @@
 #!/Users/waadna/.pyenv/shims/python
 from os import execv
-from sys import argv
+from sys import argv, executable
 import nextcord
 from nextcord.ext import commands
 from code_resources.utility.cat_run_task import CatLoop
 
 # from code_resources.! unused ! command_say
 
-from code_resources.utility.util import init_data, read_file, save_json, update_json
+from code_resources.utility.util import (
+    init_data,
+    load_json,
+    read_file,
+    save_json,
+    try_get,
+    update_json,
+)
 
 init_data()
 
@@ -45,12 +52,14 @@ async def on_message(message: nextcord.Message):
     if c == "cat":
         await message.reply("har har you said cat")
         await message.channel.send("oki i will now gib free fine cat!")
-        update_json({"fine": 1}, "data/cats.json", [message.author.id])
+        update_json(
+            {"fine": 1},
+            "",
+        )
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")
-            await bot.close()
-            execv(__file__, argv)
+            execv(executable, ["python"] + argv)
         else:
             await message.reply("skill issue")
 
