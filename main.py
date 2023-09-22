@@ -1,15 +1,17 @@
-from discord import Interaction
+#!/Users/waadna/.pyenv/shims/python
+from os import execv
+from sys import argv
 import nextcord
 from nextcord.ext import commands
 from code_resources.utility.cat_run_task import CatLoop
 
 # from code_resources.! unused ! command_say
 
-from code_resources.utility.util import init_data, read_file
+from code_resources.utility.util import init_data, read_file, save_json, update_json
 
 init_data()
 
-bot = commands.Bot()
+bot = commands.Bot(intents=nextcord.Intents.all())
 
 
 @bot.event
@@ -21,7 +23,7 @@ async def on_ready():
 
 
 @bot.slash_command("setup", "setup the bot")
-async def setup(interaction: Interaction):
+async def setup(interaction: nextcord.Interaction):
     if interaction.guild is not None and interaction.channel is not None:
         something = CatLoop(
             interaction, 0, interaction.guild.id, interaction.channel.id
@@ -29,6 +31,28 @@ async def setup(interaction: Interaction):
         await something.start()
     else:
         await interaction.send("ok smth went insanely wrong")
+
+
+@bot.event
+async def on_message(message: nextcord.Message):
+    # print("on message")
+    # print(message)
+    c = message.content
+    # print(c)
+    if bot.user is not None:
+        if message.author.id == bot.user.id:
+            return
+    if c == "cat":
+        await message.reply("har har you said cat")
+        await message.channel.send("oki i will now gib free fine cat!")
+        update_json({"fine": 1}, "data/cats.json", [message.author.id])
+    if c == "r":
+        if message.author.name == "frinkifail":
+            await message.reply("oki restarting")
+            await bot.close()
+            execv(__file__, argv)
+        else:
+            await message.reply("skill issue")
 
 
 # @bot.slash_command('say', 'make the bot say something')
