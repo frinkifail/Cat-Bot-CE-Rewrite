@@ -196,14 +196,20 @@ class JsonLoadedDict(dict):
             except Exception as e:
                 raise KeyError(e)
 
+    # temporary
+    # def set(self, key: str | int, value: Any):
+    #     self[key] = value
+
     def save(self, key: str):
+        # print(self.get(key))
         with open(f"data/{key}.json", "w") as f:
-            dump(self.__getitem__(key), f)
+            dump(self.get(key), f)
 
 
 db = JsonLoadedDict()
 
 
+# the most pain of shit but thanks anyway
 # Try Except Value Create New Object In Object
 def tevcnoio(value: Any | None, key: str, new_object: Any, in_object: dict):
     if value is None:

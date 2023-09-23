@@ -26,6 +26,9 @@ bot = commands.Bot(intents=nextcord.Intents.all())
 async def on_ready():
     if bot.user is not None:
         print(f"Logged in as {bot.user.display_name}")
+        catbot_channel = await bot.fetch_channel(1151851013637152859)
+        if isinstance(catbot_channel, nextcord.TextChannel):
+            await catbot_channel.send("oki i restarted")
     else:
         print("Not logged in (how?)")
 
@@ -62,6 +65,8 @@ async def on_message(message: nextcord.Message):
         adb: dict[str, Any] = tevcnoio(db["cats"].get(a), str(a), {}, db)
         tevcnoio(adb.get("fine"), "fine", 0, adb)
         adb["fine"] += 1
+        # print(adb, db)
+        db["cats"].update({a: adb})
         db.save("cats")
     if c == "r":
         if message.author.name == "frinkifail":
