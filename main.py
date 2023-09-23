@@ -1,20 +1,21 @@
 #!/Users/waadna/.pyenv/shims/python
 from os import execv
 from sys import argv, executable
+from typing import Any
 import nextcord
 from nextcord.ext import commands
 from code_resources.utility.cat_run_task import CatLoop
 
 # from code_resources.! unused ! command_say
 
-from code_resources.utility.util import (
-    init_data,
-    load_json,
-    read_file,
-    save_json,
-    try_get,
-    update_json,
-)
+# from code_resources.utility.util import (
+#     init_data,
+#     load_json,
+#     read_file,
+#     try_get,
+#     update_json,
+# )
+from code_resources.utility.util import db, init_data, read_file, tevcnoio
 
 init_data()
 
@@ -53,11 +54,15 @@ async def on_message(message: nextcord.Message):
     if c == "cat":
         await message.reply("har har you said cat")
         await message.channel.send("oki i will now gib free fine cat!")
-        update_json(
-            {"fine": 1},
-            "data/cats.json",
-            try_get(load_json("data/cats.json"), str(a), {}),
-        )
+        # update_json(
+        #     {"fine": 1},
+        #     "data/cats.json",
+        #     {a: try_get(load_json("data/cats.json"), str(a), {})},
+        # )
+        adb: dict[str, Any] = tevcnoio(db["cats"].get(a), str(a), {}, db)
+        tevcnoio(adb.get("fine"), "fine", 0, adb)
+        adb["fine"] += 1
+        db.save("cats")
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")

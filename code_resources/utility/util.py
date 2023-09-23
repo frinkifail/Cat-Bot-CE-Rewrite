@@ -1,10 +1,12 @@
-from json import dumps, loads
+from json import dump, dumps, load, loads
 from os import mkdir, path
 from typing import Any, Literal
 
 ValidDataFilenames = Literal["data/timings.json", "data/cats.json", "dev/TOKEN.txt"]
 ValidUpdateModes = Literal["replace", "add", "subtract"]
 
+# |< Use this for educational purposes only (it doesn't work.)
+# region old db stuff
 
 # |< Unused functions because I gave up on utility stuff
 # region AI Generated Fun
@@ -175,3 +177,40 @@ def update_json(
         )
         return current_data
     print(f"[SUCCESS] Successfully updated {filename}")
+
+
+# endregion
+
+
+# region New DB Stuff
+class JsonLoadedDict(dict):
+    def __getitem__(self, key: str | int) -> Any:
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            try:
+                with open(f"data/{key}.json", "r") as f:
+                    item = load(f)
+                super().__setitem__(key, item)
+                return item
+            except Exception as e:
+                raise KeyError(e)
+
+    def save(self, key: str):
+        with open(f"data/{key}.json", "w") as f:
+            dump(self.__getitem__(key), f)
+
+
+db = JsonLoadedDict()
+
+
+# Try Except Value Create New Object In Object
+def tevcnoio(value: Any | None, key: str, new_object: Any, in_object: dict):
+    if value is None:
+        in_object.__setitem__(key, new_object)
+        return new_object
+    else:
+        return value
+
+
+# endregion
