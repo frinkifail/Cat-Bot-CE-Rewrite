@@ -45,16 +45,18 @@ async def on_message(message: nextcord.Message):
     # print("on message")
     # print(message)
     c = message.content
+    a = message.author.id
     # print(c)
     if bot.user is not None:
-        if message.author.id == bot.user.id:
+        if a == bot.user.id:
             return
     if c == "cat":
         await message.reply("har har you said cat")
         await message.channel.send("oki i will now gib free fine cat!")
         update_json(
             {"fine": 1},
-            "",
+            "data/cats.json",
+            try_get(load_json("data/cats.json"), str(a), {}),
         )
     if c == "r":
         if message.author.name == "frinkifail":

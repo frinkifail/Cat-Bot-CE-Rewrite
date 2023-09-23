@@ -138,18 +138,25 @@ def try_get(dictionary: dict[Any, Any], key: str, default: Any = "<unset>"):
         dictionary[key] = default
     else:
         pass
-    return dictionary
+    print(dictionary, data, dictionary[key])
+    return dictionary[key]
 
 
 def update_json(
     new_dictionary: dict[Any, Any],
     filename: ValidDataFilenames | None = None,
     dictionary: dict | None = None,
+    load_file: bool = False,
 ):
-    if dictionary is None and file:
+    if (dictionary is None and filename is not None) or (
+        load_file and filename is not None
+    ):
         current_data: dict[Any, Any] = load_json(filename)
-    else:
+    elif dictionary is not None and load_file is False:
         current_data = dictionary
+    else:
+        print("[ERROR] Invalid statement")
+        return
     current_data.update(new_dictionary)
     # if mode == "replace" and isinstance(dictionary, dict):
     #     if subkeys.__len__() == 0:
@@ -160,5 +167,11 @@ def update_json(
     #     isinstance(dictionary, int) or isinstance(dictionary, float)
     # ):
     #     update_recursive_dict(current_data, subkeys, {}, "add", dictionary)
-    save_json(current_data, filename)
+    if filename is not None:
+        save_json(current_data, filename)
+    else:
+        print(
+            "[WARNING] Could not save to json file: No path specified\n- Returning current data instead"
+        )
+        return current_data
     print(f"[SUCCESS] Successfully updated {filename}")
