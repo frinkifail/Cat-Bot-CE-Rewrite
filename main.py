@@ -120,8 +120,8 @@ async def on_message(message: nc.Message):
             emoji = nc.utils.get(message.guild.emojis, name=ctype + "cat")
             await message.channel.send(
                 f" \
-{message.author.display_name} cought {emoji} {ctype.capitalize()} cat!!!!1! \
-You now have {adb[ctype]} cats of dat type!!! \
+{message.author.display_name} cought {emoji} {ctype.capitalize()} cat!!!!1!\n \
+You now have {adb[ctype]} cats of dat type!!!\n \
 this fella was cought in (uhh idk) seconds!!!!"
             )
             # await message.channel.send(f"You now have {adb[ctype]} {ctype} cats!!")
