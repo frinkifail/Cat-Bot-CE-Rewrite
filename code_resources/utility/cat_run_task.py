@@ -2,10 +2,10 @@ from asyncio import Task, create_task, sleep
 from random import randint, random
 from typing import TypedDict
 
-from discord import File, Interaction
+from discord import File, Interaction, TextChannel
 from discord.utils import get
 
-from code_resources.utility.util import load_json
+from code_resources.utility.util import load_json, db
 
 # region Cat Chances
 # Modify the `TypedDict` containing chances types to add new cats.
@@ -114,7 +114,9 @@ class CatLoop:
             await self.interaction.send("No timing set, using 2 seconds.")
             data = 2
         while self.running:
+            print(f"ok opened loop for {self.id}")
             if not self.running:
+                print(f"oki closing loop for {self.id}")
                 break
             await sleep(data)
             spawn_cat_or_no = randint(0, 100)
@@ -137,14 +139,18 @@ class CatLoop:
                         cat_type = k
                 if cat_type == "_8bit":
                     cat_type = "8bit"
-                if self.interaction.guild is not None:
+                if self.interaction.guild is not None and isinstance(
+                    self.interaction.channel, TextChannel
+                ):
                     self.cat_active = True
                     emoji = get(
                         self.interaction.guild.emojis, name=cat_type.lower() + "cat"
                     )
-                    emojistr = emoji.__str__()
+                    print("hi hello spawn cat yes cool mhm")
                     # self.interaction.send(emojistr)
-                    await self.interaction.send(
-                        f"guys!! {cat_type} apered! {emojistr}",
+                    print(db["cattype"][self.guild_id][self.channel_id], db["cattype"])
+                    db["cattype"][self.guild_id][self.channel_id] = cat_type
+                    await self.interaction.channel.send(
+                        f"guys!! {cat_type.capitalize()} apered! {emoji}",
                         file=File("code_resources/staring.png"),
                     )

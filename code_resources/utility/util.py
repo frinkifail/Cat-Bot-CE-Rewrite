@@ -93,6 +93,12 @@ ValidUpdateModes = Literal["replace", "add", "subtract"]
 
 # endregion
 
+# endregion
+
+EMOJI_GUILD_ID = 1151848215071703103
+
+# region File Manager Utilities
+
 
 def create_file(filename: str, default_data: str = ""):
     with open(filename, "w+") as f:
@@ -106,6 +112,8 @@ def init_data():
             create_file("data/timings.json", "{}")
         if not path.exists("data/cats.json"):
             create_file("data/cats.json", "{}")
+        if not path.exists("data/cattype.json"):
+            create_file("data/cattype.json", "{}")
 
     if not path.exists("data"):
         mkdir("data")
@@ -194,7 +202,7 @@ class JsonLoadedDict(dict):
                 super().__setitem__(key, item)
                 return item
             except Exception as e:
-                raise KeyError(e)
+                raise KeyError(f"This is a KeyError raised by JsonLoadedDict: {e}")
 
     # temporary
     # def set(self, key: str | int, value: Any):
