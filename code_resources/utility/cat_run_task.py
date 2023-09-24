@@ -2,7 +2,7 @@ from asyncio import Task, create_task, sleep
 from random import randint, random
 from typing import TypedDict
 
-from discord import File, Interaction, TextChannel
+from discord import File, Interaction, Message, TextChannel
 from discord.utils import get
 
 from code_resources.utility.util import load_json, db
@@ -90,6 +90,7 @@ class CatLoop:
         self.running: bool = False
         self.interaction = interaction
         self.cat_active = False
+        self.current_msg: Message | None = None
 
     async def start(self):
         if not self.running:
@@ -113,8 +114,8 @@ class CatLoop:
             )
             await self.interaction.send("No timing set, using 2 seconds.")
             data = 2
+        print(f"ok opened loop for {self.id}")
         while self.running:
-            print(f"ok opened loop for {self.id}")
             if not self.running:
                 print(f"oki closing loop for {self.id}")
                 break
@@ -146,11 +147,16 @@ class CatLoop:
                     emoji = get(
                         self.interaction.guild.emojis, name=cat_type.lower() + "cat"
                     )
-                    print("hi hello spawn cat yes cool mhm")
+                    # print("hi hello spawn cat yes cool mhm")
                     # self.interaction.send(emojistr)
-                    print(db["cattype"][self.guild_id][self.channel_id], db["cattype"])
-                    db["cattype"][self.guild_id][self.channel_id] = cat_type
-                    await self.interaction.channel.send(
-                        f"guys!! {cat_type.capitalize()} apered! {emoji}",
+                    db["cattype"].get(str(self.guild_id)).__setitem__(
+                        str(self.channel_id), cat_type
+                    )
+                    # db["cattype"][self.interaction.guild.id][
+                    #     self.interaction.channel.id
+                    # ] = cat_type
+                    # print(db["cattype"])
+                    self.current_msg = await self.interaction.channel.send(
+                        f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
                         file=File("code_resources/staring.png"),
                     )

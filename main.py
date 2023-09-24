@@ -77,6 +77,8 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
             name=f"{f'{emoji} ' if emoji else '(no emoji found kek) '}{k.capitalize()}",
             value=v,
         )
+    if embed.fields.__len__() == 0:
+        embed.add_field(name="no cats", value="go catch some")
     await interaction.send(embed=embed)
 
 
@@ -103,10 +105,22 @@ async def on_message(message: nc.Message):
         if ctype == "none":
             await message.reply("har har har you said cat")
         else:
+            # print(ctype)
             tevcnoio(adb.get(ctype), ctype, 0, adb)
             adb[ctype] += 1
+            # print(adb)
             db["cats"].update({a: adb})
+            # print(db, db["cats"])
             db.save("cats")
+            await message.delete()
+            cmsg = setup_tasks[cid].current_msg
+            if cmsg is not None:
+                await cmsg.delete()
+                setup_tasks[cid].cat_active = False
+            await message.channel.send(
+                f"{message.author.display_name} caught {ctype} in (haha my current intelligence level is not to the level of knowing how long it took)!!"
+            )
+            await message.channel.send(f"You now have {adb[ctype]} {ctype} cats!!")
         # await message.channel.send("oki i will now gib free fine cat!")
         # update_json(
         #     {"fine": 1},
