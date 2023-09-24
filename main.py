@@ -29,15 +29,26 @@ bot = commands.Bot(intents=nc.Intents.all())
 # print(db["cats"])
 
 setup_tasks: dict[int, CatLoop] = {}  # ChannelID: Loop
+cscwg: dict[
+    int, dict[int, int]
+] = {}  # Current Setup Channels With Guild # {{GuildID: ChannelID}}
 
 
 @bot.event
 async def on_ready():
     if bot.user is not None:
         print(f"Logged in as {bot.user.display_name}")
+        await bot.change_presence(
+            activity=nc.Activity(type=nc.ActivityType.playing, name="with Cat Bot"),
+            status=nc.Status.dnd,
+        )
         catbot_channel = await bot.fetch_channel(1151851013637152859)
         if isinstance(catbot_channel, nc.TextChannel):
             await catbot_channel.send("oki i restarted")
+        if setup_tasks.__len__() == 0:
+            # for i in db
+            # TODO: setup for everything in db[cscwg]
+            pass
     else:
         print("Not logged in (how?)")
 
