@@ -97,11 +97,11 @@ async def on_message(message: nc.Message):
         if a == bot.user.id:
             return
     if c == "cat":
-        if gid == 0:
+        if gid == 0 or message.guild is None:
             await message.reply("sureeeeee")
             return
         ctype_guild = tevcnoio(db["cattype"].get(str(gid)), str(gid), {}, db["cattype"])
-        ctype = tevcnoio(ctype_guild.get(str(cid)), str(cid), "none", ctype_guild)
+        ctype: str = tevcnoio(ctype_guild.get(str(cid)), str(cid), "none", ctype_guild)
         if ctype == "none":
             await message.reply("har har har you said cat")
         else:
@@ -117,10 +117,14 @@ async def on_message(message: nc.Message):
             if cmsg is not None:
                 await cmsg.delete()
                 setup_tasks[cid].cat_active = False
+            emoji = nc.utils.get(message.guild.emojis, name=ctype + "cat")
             await message.channel.send(
-                f"{message.author.display_name} caught {ctype} in (haha my current intelligence level is not to the level of knowing how long it took)!!"
+                f" \
+{message.author.display_name} cought {emoji} {ctype.capitalize()} cat!!!!1! \
+You now have {adb[ctype]} cats of dat type!!! \
+this fella was cought in (uhh idk) seconds!!!!"
             )
-            await message.channel.send(f"You now have {adb[ctype]} {ctype} cats!!")
+            # await message.channel.send(f"You now have {adb[ctype]} {ctype} cats!!")
         # await message.channel.send("oki i will now gib free fine cat!")
         # update_json(
         #     {"fine": 1},
