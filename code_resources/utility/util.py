@@ -114,6 +114,10 @@ def init_data():
             create_file("data/cats.json", "{}")
         if not path.exists("data/cattype.json"):
             create_file("data/cattype.json", "{}")
+        if not path.exists("data/cscwg.json"):
+            create_file("data/cscwg.json", "{}")
+        if not path.exists("data/achs.json"):
+            create_file("data/achs.json", "{}")
 
     if not path.exists("data"):
         mkdir("data")
@@ -219,7 +223,7 @@ db = JsonLoadedDict()
 
 # the most pain of shit but thanks anyway
 # Try Except Value Create New Object In Object
-def tevcnoio(value: Any | None, key: str, new_object: Any, in_object: dict):
+def tevcnoio(value: Any | None, key: str | int, new_object: Any, in_object: dict):
     if value is None:
         in_object.__setitem__(key, new_object)
         return new_object

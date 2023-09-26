@@ -2,7 +2,7 @@ from asyncio import Task, create_task, sleep
 from random import randint, random
 from typing import TypedDict
 
-from discord import File, Interaction, Message, TextChannel
+from discord import File, Guild, Interaction, Message, TextChannel
 from discord.utils import get
 
 from code_resources.utility.util import load_json, db
@@ -78,42 +78,43 @@ cat_chances: CatChances = {  # Ripped straight from my good friend milenakosa.
 class CatLoop:
     def __init__(
         self,
-        interaction: Interaction,
+        channel: TextChannel,
+        guild: Guild,
         loopid: str | int,
-        guild_id: int,
-        channel_id: int,
     ) -> None:
         self.id = loopid
-        self.guild_id = guild_id
-        self.channel_id = channel_id
+        # self.guild_id = guild_id
+        # self.channel_id = channel_id
         self.task: Task | None = None
         self.running: bool = False
-        self.interaction = interaction
+        # self.interaction = interaction
         self.cat_active = False
         self.current_msg: Message | None = None
+        self.channel = channel
+        self.guild = guild
 
     async def start(self):
         if not self.running:
             self.task = create_task(
                 self._loop(),
-                name=f"Spawn loop for {self.channel_id} ({self.guild_id}) also known as {self.id}",
+                name=f"Spawn loop for {self.channel.id} ({self.guild.id}) also known as {self.id}",
             )
             self.running = True
             return True
         else:
-            print("Loop is already running you bozo!")
+            print(f"loop is already running you bozo ({self.id})")
             return False
 
     async def _loop(self):
         # Get JSON data from 'data/timings.json' and get the value of key {self.guild_id}
         json_data: dict[int, float] = load_json("data/timings.json")
-        data = json_data.get(self.guild_id)
+        data = json_data.get(self.guild.id)
         if data is None:
             print(
-                "[WARNING] This guild doesn't have a timing data key. Defaulting to 2."
+                "[WARNING] This guild doesn't have a timing data key. Defaulting to 5."
             )
-            await self.interaction.send("No timing set, using 2 seconds.")
-            data = 2
+            # await self.channel.send("No timing set, using 2 seconds.")
+            data = 5
         print(f"ok opened loop for {self.id}")
         while self.running:
             if not self.running:
@@ -140,23 +141,22 @@ class CatLoop:
                         cat_type = k
                 if cat_type == "_8bit":
                     cat_type = "8bit"
-                if self.interaction.guild is not None and isinstance(
-                    self.interaction.channel, TextChannel
-                ):
-                    self.cat_active = True
-                    emoji = get(
-                        self.interaction.guild.emojis, name=cat_type.lower() + "cat"
-                    )
-                    # print("hi hello spawn cat yes cool mhm")
-                    # self.interaction.send(emojistr)
-                    db["cattype"].get(str(self.guild_id)).__setitem__(
-                        str(self.channel_id), cat_type
-                    )
-                    # db["cattype"][self.interaction.guild.id][
-                    #     self.interaction.channel.id
-                    # ] = cat_type
-                    # print(db["cattype"])
-                    self.current_msg = await self.interaction.channel.send(
-                        f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
-                        file=File("code_resources/staring.png"),
-                    )
+                # if self.interaction.guild is not None and isinstance(
+                #     self.interaction.channel, TextChannel
+                # ):
+                self.cat_active = True
+                emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
+                # print("hi hello spawn cat yes cool mhm")
+                # self.interaction.send(emojistr)
+                # db["cattype"].get(str(self.guild.id)).__setitem__(
+                #     str(self.channel.id), cat_type
+                # )
+                db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
+                # db["cattype"][self.interaction.guild.id][
+                #     self.interaction.channel.id
+                # ] = cat_type
+                # print(db["cattype"])
+                self.current_msg = await self.channel.send(
+                    f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
+                    file=File("code_resources/staring.png"),
+                )
