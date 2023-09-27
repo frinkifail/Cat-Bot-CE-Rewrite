@@ -5,6 +5,7 @@ from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
 from code_resources.achivements import Achivement, AchivementManager
+from code_resources.command_achivement import achivement_cb
 from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
@@ -72,46 +73,7 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
 
 @bot.slash_command("achivements", "see how many achivements you have")
 async def achivement(interaction: nc.Interaction):
-    msg = await interaction.send("ok workin on it")
-    db.reload("achs")
-
-    def check_lock(ach: Achivement):
-        if ach["unlocked"] == True:
-            if not v["hidden"]:
-                unlock_str = f"Unlocked: {v['description']}"
-            else:
-                unlock_str = "Unlocked."
-        else:
-            if v["hidden"]:
-                unlock_str = "Locked."
-            else:
-                unlock_str = f"Locked: {v['description']}"
-        return unlock_str
-
-    user = interaction.user
-    if user is None:
-        await interaction.send("User not found.")
-        return
-    embed = nc.Embed(color=nc.Color.brand_green(), title="Achivements")
-    a = user.id
-    adb: dict[str, Achivement] = tevcnoio(db["achs"].get(str(a)), str(a), {}, db)
-    for k, v in achivements.items():
-        ach = adb.get(k)
-        if ach is not None:
-            unlock_str = check_lock(ach)
-        else:
-            adb[k] = AchivementManager.new(
-                v["unlocked_using"],
-                v["unlocked"],
-                v["unlocked_by"],
-                v["phrase"],
-                v["description"],
-                v["hidden"],
-            )
-            unlock_str = check_lock(adb[k])
-
-        embed.add_field(name=k.capitalize(), value=unlock_str)
-    await msg.edit("", embed=embed)
+    await achivement_cb(interaction)
 
 
 @bot.event
