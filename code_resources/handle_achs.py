@@ -7,9 +7,9 @@ from .current_achs import achivements
 
 async def handle_ach(message: Message, msg: str, user: User | Member):
     async def unlock_ach(ach_name: str, ach_type: UnlockedUsing):
-        print("ADB:", adb)
+        # print("ADB:", adb)
         ach = adb.get(ach_name)
-        print("ACH:", ach)
+        # print("ACH:", ach)
         if ach is not None:
             success = AchivementManager.unlock(ach, str(user))
         else:

@@ -14,7 +14,7 @@ class Achivement(TypedDict):
 class AchivementManager:
     @staticmethod
     def unlock(achivement: Achivement, by: str):
-        print("Unlocked:", achivement["unlocked"])
+        # print("Unlocked:", achivement["unlocked"])
         if not achivement["unlocked"]:
             achivement["unlocked"] = True
             achivement["unlocked_by"] = by

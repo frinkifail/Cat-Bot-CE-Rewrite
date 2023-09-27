@@ -7,6 +7,7 @@ from .utility.util import EMOJI_GUILD_ID, tevcnoio, db
 
 
 async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
+    msg = await interaction.send("workin on it!")
     viewing_self = False
     if person is not None:
         user = person
@@ -30,4 +31,4 @@ async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
         )
     if embed.fields.__len__() == 0:
         embed.add_field(name="no cats", value="go catch some")
-    await interaction.send(embed=embed)
+    await msg.edit("", embed=embed)
