@@ -4,6 +4,7 @@ from sys import argv, executable
 from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
+from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
 from code_resources.utility.cat_run_task import CatLoop
 
@@ -34,6 +35,8 @@ cscwg: dict[
     int, list[int]
 ] = {}  # Current Setup Channels With Guild # {GuildID: [ChannelID, ...]}
 
+RESTART_LOG = 1154694509494550568
+
 
 @bot.event
 async def on_ready():
@@ -43,7 +46,7 @@ async def on_ready():
             activity=nc.Activity(type=nc.ActivityType.playing, name="with Cat Bot"),
             status=nc.Status.dnd,
         )
-        catbot_channel = await bot.fetch_channel(1151851013637152859)
+        catbot_channel = await bot.fetch_channel(RESTART_LOG)
         if isinstance(catbot_channel, nc.TextChannel):
             await catbot_channel.send("oki i restarted")
         if setup_tasks.__len__() == 0:
@@ -67,34 +70,7 @@ async def on_ready():
 
 @bot.slash_command("setup", "setup the bot")
 async def setup(interaction: nc.Interaction):
-    if interaction.guild is not None and isinstance(
-        interaction.channel, nc.TextChannel
-    ):
-        cid = interaction.channel.id
-        gid = interaction.guild.id
-        print(gid, cid)
-        setup_tasks[cid] = CatLoop(interaction.channel, interaction.guild, 0)
-        await setup_tasks[cid].start()
-        # db['cscwg'].update({gid: [cid]})
-        guild_cscwg_db: dict[int, list[int]] = tevcnoio(
-            db["cscwg"].get(gid), gid, {}, db["cscwg"]
-        )
-        print("db, guild db:", db, guild_cscwg_db)
-        channel_cscwg_db: list[int] = tevcnoio(
-            guild_cscwg_db.get(cid), cid, [], guild_cscwg_db
-        )
-        print("guild db after creation:", guild_cscwg_db)
-        print("channel db:", channel_cscwg_db)
-        channel_cscwg_db.append(cid)
-        print("guild db after set:", guild_cscwg_db)
-        db["cscwg"].update(guild_cscwg_db)
-        print("after set update:", db, db["cscwg"])
-        db.save("cscwg")
-        await interaction.send(
-            f"oki! i will now send cats in #{interaction.channel.name}!"
-        )
-    else:
-        await interaction.send("skull emoji :skull:")
+    await setup_cb(interaction, setup_tasks)
 
 
 @bot.slash_command("inventory", "see your or other's inventory")

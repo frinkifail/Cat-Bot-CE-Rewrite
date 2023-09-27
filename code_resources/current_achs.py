@@ -1,3 +1,3 @@
-from .achivements import Achivement
+from .achivements import Achivement, AchivementManager
 
-achivements = {"testing": Achivement("exact", phrase="devtest")}
+achivements = {"testing": AchivementManager.new("exact", phrase="devtest")}

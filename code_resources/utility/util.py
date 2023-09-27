@@ -1,8 +1,15 @@
 from json import dump, dumps, load, loads
 from os import mkdir, path
+import pickle
 from typing import Any, Literal
 
-ValidDataFilenames = Literal["data/timings.json", "data/cats.json", "dev/TOKEN.txt"]
+ValidDataFilenames = Literal[
+    "data/timings.json",
+    "data/cats.json",
+    "dev/TOKEN.txt",
+    "data/cattype.json",
+    "data/cscwg.json",
+]
 ValidUpdateModes = Literal["replace", "add", "subtract"]
 
 # |< Use this for educational purposes only (it doesn't work.)
@@ -118,6 +125,8 @@ def init_data():
             create_file("data/cscwg.json", "{}")
         if not path.exists("data/achs.json"):
             create_file("data/achs.json", "{}")
+        # if not path.exists("data/achs"):
+        # mkdir("data/achs")
 
     if not path.exists("data"):
         mkdir("data")
@@ -146,14 +155,15 @@ def save_json(dictionary: dict[Any, Any], filename: ValidDataFilenames):
     write_file(filename, data)
 
 
-def try_get(dictionary: dict[Any, Any], key: str, default: Any = "<unset>"):
-    data = dictionary.get(key)
-    if data is None:
-        dictionary[key] = default
-    else:
-        pass
-    print(dictionary, data, dictionary[key])
-    return dictionary[key]
+# Replaced by tevcnoio:tm:
+# def try_get(dictionary: dict[Any, Any], key: str, default: Any = "<unset>"):
+# data = dictionary.get(key)
+# if data is None:
+#     dictionary[key] = default
+# else:
+#     pass
+# print(dictionary, data, dictionary[key])
+# return dictionary[key]
 
 
 def update_json(
@@ -190,6 +200,21 @@ def update_json(
         return current_data
     print(f"[SUCCESS] Successfully updated {filename}")
 
+
+# V Deprecated
+# region Pickle Stuff
+# def save_object(obj: Any, filename: str):
+#     with open(filename, "wb") as outp:  # Overwrites any existing file.
+#         pickle.dump(obj, outp, pickle.HIGHEST_PROTOCOL)
+
+
+# def load_object(filename: str):
+#     with open(filename, "rb") as inp:
+#         data = pickle.load(inp)
+#     return data
+
+
+# endregion
 
 # endregion
 
