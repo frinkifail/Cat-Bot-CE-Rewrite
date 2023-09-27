@@ -10,7 +10,6 @@ async def setup_cb(interaction: Interaction, setup_tasks: dict[int, CatLoop]):
         print(gid, cid)
         setup_tasks[cid] = CatLoop(interaction.channel, interaction.guild, 0)
         await setup_tasks[cid].start()
-        # db['cscwg'].update({gid: [cid]})
         guild_cscwg_db: dict[int, list[int]] = tevcnoio(
             db["cscwg"].get(gid), gid, {}, db["cscwg"]
         )

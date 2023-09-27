@@ -1,6 +1,5 @@
 from json import dump, dumps, load, loads
 from os import mkdir, path
-import pickle
 from typing import Any, Literal
 
 ValidDataFilenames = Literal[
@@ -11,96 +10,6 @@ ValidDataFilenames = Literal[
     "data/cscwg.json",
 ]
 ValidUpdateModes = Literal["replace", "add", "subtract"]
-
-# |< Use this for educational purposes only (it doesn't work.)
-# region old db stuff
-
-# |< Unused functions because I gave up on utility stuff
-# region AI Generated Fun
-# def get_recursive_dict(dictionary: dict[Any, Any], subkeys: list[str | int]):
-#     """
-#     Recursively gets the value of a nested dictionary using a list of subkeys.
-
-#     Args:
-#         dictionary: The nested dictionary.
-#         subkeys: A list of subkeys.
-
-#     Returns:
-#         The value of the nested dictionary at the specified subkeys.
-#     """
-
-#     if len(subkeys) == 1:
-#         return dictionary[subkeys[0]]
-#     else:
-#         return get_recursive_dict(dictionary[subkeys[0]], subkeys[1:])
-
-
-# def set_recursive_dict(dictionary: dict[Any, Any], subkeys: list[str], value: Any):
-#     """
-#     Recursively sets the value of a nested dictionary using a list of subkeys.
-
-#     Args:
-#         dictionary: The nested dictionary.
-#         subkeys: A list of subkeys.
-#         value: The value to set.
-
-#     Returns:
-#         None.
-#     """
-
-#     if len(subkeys) == 1:
-#         dictionary[subkeys[0]] = value
-#     else:
-#         if subkeys[0] not in dictionary:
-#             dictionary[subkeys[0]] = {}
-
-#         set_recursive_dict(dictionary[subkeys[0]], subkeys[1:], value)
-
-
-# def update_recursive_dict(
-#     dictionary: dict[Any, Any],
-#     subkeys: list[str],
-#     new_updated: dict[Any, Any],
-#     mode: ValidUpdateModes = "replace",
-#     amount: float | int = 0,
-# ):
-#     """
-#     Recursively updates the value of a nested dictionary using a list of subkeys and a new updated dictionary.
-
-#     Args:
-#         dictionary: The nested dictionary.
-#         subkeys: A list of subkeys.
-#         new_updated: A new updated dictionary.
-
-#     Returns:
-#         None.
-#     """
-#     print(mode)
-#     if len(subkeys) == 1:
-#         if dictionary.get(subkeys[0]) is not None:
-#             dictionary[subkeys[0]].update(new_updated)
-#         else:
-#             dictionary[subkeys[0]] = {}
-#             dictionary[subkeys[0]].update(new_updated)
-#             print("shiver me timbers")
-#     else:
-#         if subkeys[0] not in dictionary:
-#             if mode != "add" or mode != "subtract":
-#                 dictionary[subkeys[0]] = {}
-#             else:
-#                 dictionary[subkeys[0]] = 0
-#         elif subkeys[0] in dictionary:
-#             if mode == "add" and amount != 0:
-#                 dictionary[subkeys[0]] += amount
-#             elif mode == "subtract" and amount != 0:
-#                 dictionary[subkeys[0]] -= amount
-
-#         update_recursive_dict(dictionary[subkeys[0]], subkeys[1:], new_updated, mode)
-
-
-# endregion
-
-# endregion
 
 EMOJI_GUILD_ID = 1151848215071703103
 
@@ -125,8 +34,6 @@ def init_data():
             create_file("data/cscwg.json", "{}")
         if not path.exists("data/achs.json"):
             create_file("data/achs.json", "{}")
-        # if not path.exists("data/achs"):
-        # mkdir("data/achs")
 
     if not path.exists("data"):
         mkdir("data")
@@ -155,17 +62,6 @@ def save_json(dictionary: dict[Any, Any], filename: ValidDataFilenames):
     write_file(filename, data)
 
 
-# Replaced by tevcnoio:tm:
-# def try_get(dictionary: dict[Any, Any], key: str, default: Any = "<unset>"):
-# data = dictionary.get(key)
-# if data is None:
-#     dictionary[key] = default
-# else:
-#     pass
-# print(dictionary, data, dictionary[key])
-# return dictionary[key]
-
-
 def update_json(
     new_dictionary: dict[Any, Any],
     filename: ValidDataFilenames | None = None,
@@ -182,15 +78,6 @@ def update_json(
         print("[ERROR] Invalid statement")
         return
     current_data.update(new_dictionary)
-    # if mode == "replace" and isinstance(dictionary, dict):
-    #     if subkeys.__len__() == 0:
-    #         current_data.update(dictionary)
-    #     else:
-    #         update_recursive_dict(current_data, subkeys, dictionary)
-    # elif mode == "add" and (
-    #     isinstance(dictionary, int) or isinstance(dictionary, float)
-    # ):
-    #     update_recursive_dict(current_data, subkeys, {}, "add", dictionary)
     if filename is not None:
         save_json(current_data, filename)
     else:
@@ -200,21 +87,6 @@ def update_json(
         return current_data
     print(f"[SUCCESS] Successfully updated {filename}")
 
-
-# V Deprecated
-# region Pickle Stuff
-# def save_object(obj: Any, filename: str):
-#     with open(filename, "wb") as outp:  # Overwrites any existing file.
-#         pickle.dump(obj, outp, pickle.HIGHEST_PROTOCOL)
-
-
-# def load_object(filename: str):
-#     with open(filename, "rb") as inp:
-#         data = pickle.load(inp)
-#     return data
-
-
-# endregion
 
 # endregion
 
@@ -233,12 +105,7 @@ class JsonLoadedDict(dict):
             except Exception as e:
                 raise KeyError(f"This is a KeyError raised by JsonLoadedDict: {e}")
 
-    # temporary
-    # def set(self, key: str | int, value: Any):
-    #     self[key] = value
-
     def save(self, key: str):
-        # print(self.get(key))
         with open(f"data/{key}.json", "w") as f:
             dump(self.get(key), f)
 

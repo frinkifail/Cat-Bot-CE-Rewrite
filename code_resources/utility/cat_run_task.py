@@ -83,11 +83,8 @@ class CatLoop:
         loopid: str | int,
     ) -> None:
         self.id = loopid
-        # self.guild_id = guild_id
-        # self.channel_id = channel_id
         self.task: Task | None = None
         self.running: bool = False
-        # self.interaction = interaction
         self.cat_active = False
         self.current_msg: Message | None = None
         self.channel = channel
@@ -141,21 +138,9 @@ class CatLoop:
                         cat_type = k
                 if cat_type == "_8bit":
                     cat_type = "8bit"
-                # if self.interaction.guild is not None and isinstance(
-                #     self.interaction.channel, TextChannel
-                # ):
                 self.cat_active = True
                 emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
-                # print("hi hello spawn cat yes cool mhm")
-                # self.interaction.send(emojistr)
-                # db["cattype"].get(str(self.guild.id)).__setitem__(
-                #     str(self.channel.id), cat_type
-                # )
                 db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
-                # db["cattype"][self.interaction.guild.id][
-                #     self.interaction.channel.id
-                # ] = cat_type
-                # print(db["cattype"])
                 self.current_msg = await self.channel.send(
                     f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
                     file=File("code_resources/staring.png"),

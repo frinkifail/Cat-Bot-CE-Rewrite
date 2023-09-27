@@ -81,8 +81,6 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
 
 @bot.event
 async def on_message(message: nc.Message):
-    # print("on message")
-    # print(message)
     c = message.content
     a = message.author.id
     gid = (
@@ -102,12 +100,10 @@ async def on_message(message: nc.Message):
         if ctype == "none":
             await message.reply("har har har you said cat")
         else:
-            # print(ctype)
             tevcnoio(adb.get(ctype), ctype, 0, adb)
             adb[ctype] += 1
             # print(adb)
             db["cats"].update({a: adb})
-            # print(db, db["cats"])
             db.save("cats")
             await message.delete()
             cmsg = setup_tasks[cid].current_msg
@@ -122,13 +118,6 @@ You now have {adb[ctype]} cats of dat type!!!\n\
 this fella was cought in (uhh idk) seconds!!!!"
             )
             db["cattype"][str(gid)][str(cid)] = "none"
-            # await message.channel.send(f"You now have {adb[ctype]} {ctype} cats!!")
-        # await message.channel.send("oki i will now gib free fine cat!")
-        # update_json(
-        #     {"fine": 1},
-        #     "data/cats.json",
-        #     {a: try_get(load_json("data/cats.json"), str(a), {})},
-        # )
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")

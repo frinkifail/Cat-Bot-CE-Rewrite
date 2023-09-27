@@ -10,19 +10,11 @@ async def handle_ach(message: Message, msg: str, user: User | Member):
         print("ADB:", adb)
         ach = adb.get(ach_name)
         print("ACH:", ach)
-        # formatted_path = f'data/achs/{a}.pkl'
-        # try:
-        #     achs = load_object(formatted_path)
-        # except FileNotFoundError:
-        #     save_object({}, formatted_path)
-        #     achs = load_object(formatted_path)
-        # ach = achs[ach_name]
         if ach is not None:
             success = AchivementManager.unlock(ach, str(user))
         else:
             adb[ach_name] = AchivementManager.new(ach_type)
             success = AchivementManager.unlock(adb[ach_name], str(user))
-        # print("Success:", success)
         if isinstance(message.channel, TextChannel):
             if success:
                 await message.channel.send(

@@ -16,13 +16,11 @@ async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
         await interaction.send("something went wrong")
         return
     a = user.id
-    # print(db['cats'], a, db['cats'].get(a))
     adb: dict[str, Any] = tevcnoio(db["cats"].get(str(a)), str(a), {}, db)
     embed = Embed(
         color=Color.blurple(),
         title=f"{'Your' if viewing_self else user.display_name}'s cats",
     )
-    # embed.add_field()
     for k, v in adb.items():
         guild = await bot.fetch_guild(EMOJI_GUILD_ID)
         emoji = get(guild.emojis, name=f"{k}cat")
