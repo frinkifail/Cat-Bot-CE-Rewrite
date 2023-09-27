@@ -100,10 +100,20 @@ class JsonLoadedDict(dict):
             try:
                 with open(f"data/{key}.json", "r") as f:
                     item = load(f)
-                super().__setitem__(key, item)
+                self.__setitem__(key, item)
                 return item
             except Exception as e:
                 raise KeyError(f"This is a KeyError raised by JsonLoadedDict: {e}")
+
+    def reload(self, key: str | int):
+        try:
+            with open(f"data/{key}.json", "r") as f:
+                item = load(f)
+            self.__setitem__(key, item)
+        except Exception as e:
+            raise UserWarning(
+                f"This is a KeyError raised by JsonLoadedDict's reload method: {e}"
+            )
 
     def save(self, key: str):
         with open(f"data/{key}.json", "w") as f:

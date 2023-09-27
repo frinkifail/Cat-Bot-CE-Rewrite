@@ -4,20 +4,12 @@ from sys import argv, executable
 from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
+from code_resources.achivements import Achivement, AchivementManager
 from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
 from code_resources.utility.cat_run_task import CatLoop
-
-# from code_resources.! unused ! command_say
-
-# from code_resources.utility.util import (
-#     init_data,
-#     load_json,
-#     read_file,
-#     try_get,
-#     update_json,
-# )
+from code_resources.current_achs import achivements
 from code_resources.utility.util import (
     EMOJI_GUILD_ID,
     db,
@@ -29,7 +21,6 @@ from code_resources.utility.util import (
 init_data()
 
 bot = commands.Bot(intents=nc.Intents.all())
-# print(db["cats"])
 
 setup_tasks: dict[int, CatLoop] = {}  # ChannelID: Loop
 cscwg: dict[
@@ -79,6 +70,50 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
     await inventory_cb(interaction, person, bot)
 
 
+@bot.slash_command("achivements", "see how many achivements you have")
+async def achivement(interaction: nc.Interaction):
+    msg = await interaction.send("ok workin on it")
+    db.reload("achs")
+
+    def check_lock(ach: Achivement):
+        if ach["unlocked"] == True:
+            if not v["hidden"]:
+                unlock_str = f"Unlocked: {v['description']}"
+            else:
+                unlock_str = "Unlocked."
+        else:
+            if v["hidden"]:
+                unlock_str = "Locked."
+            else:
+                unlock_str = f"Locked: {v['description']}"
+        return unlock_str
+
+    user = interaction.user
+    if user is None:
+        await interaction.send("User not found.")
+        return
+    embed = nc.Embed(color=nc.Color.brand_green(), title="Achivements")
+    a = user.id
+    adb: dict[str, Achivement] = tevcnoio(db["achs"].get(str(a)), str(a), {}, db)
+    for k, v in achivements.items():
+        ach = adb.get(k)
+        if ach is not None:
+            unlock_str = check_lock(ach)
+        else:
+            adb[k] = AchivementManager.new(
+                v["unlocked_using"],
+                v["unlocked"],
+                v["unlocked_by"],
+                v["phrase"],
+                v["description"],
+                v["hidden"],
+            )
+            unlock_str = check_lock(adb[k])
+
+        embed.add_field(name=k.capitalize(), value=unlock_str)
+    await msg.edit("", embed=embed)
+
+
 @bot.event
 async def on_message(message: nc.Message):
     c = message.content
@@ -111,9 +146,13 @@ async def on_message(message: nc.Message):
                 await cmsg.delete()
                 setup_tasks[cid].cat_active = False
             emoji = nc.utils.get(message.guild.emojis, name=ctype + "cat")
+            dn = message.author.display_name
+            # print("Display name:", dn)
+            if dn == "@everyone" or dn == "@here":
+                dn = "YouTried"
             await message.channel.send(
                 f" \
-{message.author.display_name} cought {emoji} {ctype.capitalize()} cat!!!!1!\n\
+{dn} cought {emoji} {ctype.capitalize()} cat!!!!1!\n\
 You now have {adb[ctype]} cats of dat type!!!\n\
 this fella was cought in (uhh idk) seconds!!!!"
             )

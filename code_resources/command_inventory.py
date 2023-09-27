@@ -17,6 +17,7 @@ async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
         await interaction.send("something went wrong")
         return
     a = user.id
+    db.reload("cats")
     adb: dict[str, Any] = tevcnoio(db["cats"].get(str(a)), str(a), {}, db)
     embed = Embed(
         color=Color.blurple(),

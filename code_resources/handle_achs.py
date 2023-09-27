@@ -6,14 +6,14 @@ from .current_achs import achivements
 
 
 async def handle_ach(message: Message, msg: str, user: User | Member):
-    async def unlock_ach(ach_name: str, ach_type: UnlockedUsing):
+    async def unlock_ach(ach_name: str, ach_type: UnlockedUsing, ach_desc: str):
         # print("ADB:", adb)
         ach = adb.get(ach_name)
         # print("ACH:", ach)
         if ach is not None:
             success = AchivementManager.unlock(ach, str(user))
         else:
-            adb[ach_name] = AchivementManager.new(ach_type)
+            adb[ach_name] = AchivementManager.new(ach_type, description=ach_desc)
             success = AchivementManager.unlock(adb[ach_name], str(user))
         if isinstance(message.channel, TextChannel):
             if success:
@@ -38,7 +38,7 @@ async def handle_ach(message: Message, msg: str, user: User | Member):
     for k, v in achivements.items():
         if v["unlocked_using"] == "exact":
             if v["phrase"] == msg:
-                await unlock_ach(k, "exact")
+                await unlock_ach(k, "exact", v["description"])
         if v["unlocked_using"] == "includes":
             if msg in v["phrase"]:
-                await unlock_ach(k, "includes")
+                await unlock_ach(k, "includes", v["description"])
