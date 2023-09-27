@@ -4,6 +4,7 @@ from sys import argv, executable
 from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
+from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
 from code_resources.utility.cat_run_task import CatLoop
@@ -75,32 +76,7 @@ async def setup(interaction: nc.Interaction):
 
 @bot.slash_command("inventory", "see your or other's inventory")
 async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
-    viewing_self = False
-    if person is not None:
-        user = person
-    elif interaction.user is not None:
-        user = interaction.user
-    else:
-        await interaction.send("something went wrong")
-        return
-    a = user.id
-    # print(db['cats'], a, db['cats'].get(a))
-    adb: dict[str, Any] = tevcnoio(db["cats"].get(str(a)), str(a), {}, db)
-    embed = nc.Embed(
-        color=nc.Color.blurple(),
-        title=f"{'Your' if viewing_self else user.display_name}'s cats",
-    )
-    # embed.add_field()
-    for k, v in adb.items():
-        guild = await bot.fetch_guild(EMOJI_GUILD_ID)
-        emoji = nc.utils.get(guild.emojis, name=f"{k}cat")
-        embed.add_field(
-            name=f"{f'{emoji} ' if emoji else '(no emoji found kek) '}{k.capitalize()}",
-            value=v,
-        )
-    if embed.fields.__len__() == 0:
-        embed.add_field(name="no cats", value="go catch some")
-    await interaction.send(embed=embed)
+    await inventory_cb(interaction, person, bot)
 
 
 @bot.event
