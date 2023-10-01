@@ -1,7 +1,7 @@
 from discord import Member, Message, TextChannel, User
 
 from .achivements import Achivement, AchivementManager, UnlockedUsing
-from .utility.util import tevcnoio, db
+from .utility.util import db
 from .current_achs import achivements
 
 
@@ -18,7 +18,7 @@ async def handle_ach(message: Message, msg: str, user: User | Member):
         if isinstance(message.channel, TextChannel):
             if success:
                 await message.channel.send(
-                    f"{user.display_name} just unlocked {ach_name}!"
+                    f"{user.global_name} just unlocked {ach_name}!"
                 )
             else:
                 if user.dm_channel is not None:
@@ -30,15 +30,14 @@ async def handle_ach(message: Message, msg: str, user: User | Member):
                     # and yes, i do know how to use `User|Member#create_dm`, I'm just too lazy.
         else:
             print("oh, interaction.channel isn't a textchannel...\nthat's a shame.")
-        db["achs"].update({str(a): adb})
+        db["achs"].update({str(user.id): adb})
         db.save("achs")
 
-    a = user.id
-    adb: dict[str, Achivement] = tevcnoio(db["achs"].get(str(a)), str(a), {}, db)
+    adb: dict[str, Achivement] = db.uget(user.id, "achs")
     for k, v in achivements.items():
         if v["unlocked_using"] == "exact":
             if v["phrase"] == msg:
                 await unlock_ach(k, "exact", v["description"])
         if v["unlocked_using"] == "includes":
-            if msg in v["phrase"]:
+            if v["phrase"] in msg:
                 await unlock_ach(k, "includes", v["description"])

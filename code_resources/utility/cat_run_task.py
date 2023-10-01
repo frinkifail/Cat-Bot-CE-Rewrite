@@ -2,7 +2,7 @@ from asyncio import Task, create_task, sleep
 from random import randint, random
 from typing import TypedDict
 
-from discord import File, Guild, Interaction, Message, TextChannel
+from discord import File, Guild, Message, TextChannel
 from discord.utils import get
 
 from code_resources.utility.util import load_json, db
@@ -97,6 +97,7 @@ class CatLoop:
                 name=f"Spawn loop for {self.channel.id} ({self.guild.id}) also known as {self.id}",
             )
             self.running = True
+            print(f"succesfully started {self.id}")
             return True
         else:
             print(f"loop is already running you bozo ({self.id})")
@@ -112,6 +113,8 @@ class CatLoop:
             )
             # await self.channel.send("No timing set, using 2 seconds.")
             data = 5
+            db["timings"][self.guild.id][self.channel.id] = 5
+            # db.save("timings")
         print(f"ok opened loop for {self.id}")
         while self.running:
             if not self.running:

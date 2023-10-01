@@ -4,15 +4,12 @@ from sys import argv, executable
 from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
-from code_resources.achivements import Achivement, AchivementManager
 from code_resources.command_achivement import achivement_cb
 from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
 from code_resources.utility.cat_run_task import CatLoop
-from code_resources.current_achs import achivements
 from code_resources.utility.util import (
-    EMOJI_GUILD_ID,
     db,
     init_data,
     read_file,
@@ -34,7 +31,7 @@ RESTART_LOG = 1154694509494550568
 @bot.event
 async def on_ready():
     if bot.user is not None:
-        print(f"Logged in as {bot.user.display_name}")
+        print(f"Logged in as {bot.user.global_name}")
         await bot.change_presence(
             activity=nc.Activity(type=nc.ActivityType.playing, name="with Cat Bot"),
             status=nc.Status.dnd,
@@ -66,6 +63,24 @@ async def setup(interaction: nc.Interaction):
     await setup_cb(interaction, setup_tasks)
 
 
+@bot.slash_command("forget", "i forgor :skull: (unsetup)")
+async def forgor(interaction: nc.Interaction):
+    if interaction.guild is None or not isinstance(interaction.channel, nc.TextChannel):
+        await interaction.send("what ur tryna do??")
+        return
+    cid = interaction.channel.id
+    gid = interaction.guild.id
+    try:
+        setup_tasks[cid].running = False
+        db["cscwg"][gid].remove(cid)
+        db.save("cscwg")
+        await interaction.send(
+            f"share if you have dementia (successfully forgort this channel)"
+        )
+    except KeyError or ValueError:
+        await interaction.send(f"{interaction.channel} isn't setup yet")
+
+
 @bot.slash_command("inventory", "see your or other's inventory")
 async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
     await inventory_cb(interaction, person, bot)
@@ -84,7 +99,7 @@ async def on_message(message: nc.Message):
         message.guild.id if message.guild else 0
     )  # smhhhh null checks for example they send in dms or smthhhh
     cid = message.channel.id
-    adb: dict[str, Any] = tevcnoio(db["cats"].get(str(a)), str(a), {}, db)
+    adb: dict[str, Any] = db.uget(a, "cats")
     if bot.user is not None:
         if a == bot.user.id:
             return
@@ -108,7 +123,7 @@ async def on_message(message: nc.Message):
                 await cmsg.delete()
                 setup_tasks[cid].cat_active = False
             emoji = nc.utils.get(message.guild.emojis, name=ctype + "cat")
-            dn = message.author.display_name
+            dn = message.author.global_name
             # print("Display name:", dn)
             if dn == "@everyone" or dn == "@here":
                 dn = "YouTried"

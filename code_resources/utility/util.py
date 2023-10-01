@@ -10,6 +10,7 @@ ValidDataFilenames = Literal[
     "data/cscwg.json",
 ]
 ValidUpdateModes = Literal["replace", "add", "subtract"]
+DBKeys = Literal["cats", "achs", "cattype", "cscwg", "timings"]
 
 EMOJI_GUILD_ID = 1151848215071703103
 
@@ -118,6 +119,9 @@ class JsonLoadedDict(dict):
     def save(self, key: str):
         with open(f"data/{key}.json", "w") as f:
             dump(self.get(key), f)
+
+    def uget(self, uid: int, dbkey: DBKeys, gid: int = 0, default: Any = {}):
+        return tevcnoio(self[dbkey].get(str(uid)), str(uid), default, self)
 
 
 db = JsonLoadedDict()

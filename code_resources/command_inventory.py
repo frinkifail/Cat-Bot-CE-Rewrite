@@ -1,9 +1,8 @@
 from typing import Any
-from discord import Color, Embed, Interaction, Member, User
+from discord import Color, Embed, Interaction, User
 from nextcord.ext.commands import Bot
 from nextcord.utils import get
-
-from .utility.util import EMOJI_GUILD_ID, tevcnoio, db
+from .utility.util import EMOJI_GUILD_ID, db
 
 
 async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
@@ -16,12 +15,11 @@ async def inventory_cb(interaction: Interaction, person: User | None, bot: Bot):
     else:
         await interaction.send("something went wrong")
         return
-    a = user.id
     db.reload("cats")
-    adb: dict[str, Any] = tevcnoio(db["cats"].get(str(a)), str(a), {}, db)
+    adb: dict[str, Any] = db.uget(user.id, "cats")
     embed = Embed(
         color=Color.blurple(),
-        title=f"{'Your' if viewing_self else user.display_name}'s cats",
+        title=f"{'Your' if viewing_self else user.global_name}'s cats",
     )
     for k, v in adb.items():
         guild = await bot.fetch_guild(EMOJI_GUILD_ID)

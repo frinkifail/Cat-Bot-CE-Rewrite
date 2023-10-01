@@ -1,5 +1,4 @@
 from typing import Literal, TypeAlias, TypedDict
-from discord import Member, User
 
 UnlockedUsing: TypeAlias = Literal["exact", "includes"]
 

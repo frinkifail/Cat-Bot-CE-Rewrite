@@ -1,5 +1,5 @@
 from discord import Color, Embed, Interaction
-from .utility.util import db, tevcnoio
+from .utility.util import db
 from .achivements import Achivement, AchivementManager
 from .current_achs import achivements
 
@@ -26,8 +26,7 @@ async def achivement_cb(interaction: Interaction):
         await interaction.send("User not found.")
         return
     embed = Embed(color=Color.brand_green(), title="Achivements")
-    a = user.id
-    adb: dict[str, Achivement] = tevcnoio(db["achs"].get(str(a)), str(a), {}, db)
+    adb: dict[str, Achivement] = db.uget(user.id, "achs")
     for k, v in achivements.items():
         ach = adb.get(k)
         if ach is not None:

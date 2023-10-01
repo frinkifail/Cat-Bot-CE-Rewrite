@@ -1,4 +1,4 @@
-from .achivements import Achivement, AchivementManager
+from .achivements import AchivementManager
 
 achivements = {
     "testing": AchivementManager.new(
