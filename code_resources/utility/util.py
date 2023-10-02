@@ -35,6 +35,8 @@ def init_data():
             create_file("data/cscwg.json", "{}")
         if not path.exists("data/achs.json"):
             create_file("data/achs.json", "{}")
+        if not path.exists("data/times.json"):
+            create_file("data/times.json", "{}")
 
     if not path.exists("data"):
         mkdir("data")

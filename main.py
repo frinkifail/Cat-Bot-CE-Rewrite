@@ -5,15 +5,16 @@ from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
 from code_resources.command_achivement import achivement_cb
+from code_resources.command_forget import forget_cb
 from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
+from code_resources.handle_catch import catch_cb
 from code_resources.utility.cat_run_task import CatLoop
 from code_resources.utility.util import (
     db,
     init_data,
     read_file,
-    tevcnoio,
 )
 
 init_data()
@@ -26,6 +27,8 @@ cscwg: dict[
 ] = {}  # Current Setup Channels With Guild # {GuildID: [ChannelID, ...]}
 
 RESTART_LOG = 1154694509494550568
+
+# region Events
 
 
 @bot.event
@@ -58,41 +61,6 @@ async def on_ready():
         print("Not logged in (how?)")
 
 
-@bot.slash_command("setup", "setup the bot")
-async def setup(interaction: nc.Interaction):
-    await setup_cb(interaction, setup_tasks)
-
-
-@bot.slash_command("forget", "i forgor :skull: (unsetup)")
-async def forgor(interaction: nc.Interaction):
-    if interaction.guild is None or not isinstance(interaction.channel, nc.TextChannel):
-        await interaction.send("what ur tryna do??")
-        return
-    cid = interaction.channel.id
-    gid = interaction.guild.id
-    try:
-        db.reload("cscwg")
-        setup_tasks[cid].running = False
-        # print(db['cscwg'])
-        db["cscwg"][str(gid)].remove(cid)
-        db.save("cscwg")
-        await interaction.send(
-            f"share if you have dementia (successfully forgort this channel)"
-        )
-    except KeyError or ValueError:
-        await interaction.send(f"{interaction.channel} isn't setup yet")
-
-
-@bot.slash_command("inventory", "see your or other's inventory")
-async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
-    await inventory_cb(interaction, person, bot)
-
-
-@bot.slash_command("achivements", "see how many achivements you have")
-async def achivement(interaction: nc.Interaction):
-    await achivement_cb(interaction)
-
-
 @bot.event
 async def on_message(message: nc.Message):
     c = message.content
@@ -106,36 +74,7 @@ async def on_message(message: nc.Message):
         if a == bot.user.id:
             return
     if c == "cat":
-        if gid == 0 or message.guild is None:
-            await message.reply("sureeeeee")
-            return
-        ctype_guild = tevcnoio(db["cattype"].get(str(gid)), str(gid), {}, db["cattype"])
-        ctype: str = tevcnoio(ctype_guild.get(str(cid)), str(cid), "none", ctype_guild)
-        if ctype == "none":
-            await message.reply("har har har you said cat")
-        else:
-            tevcnoio(adb.get(ctype), ctype, 0, adb)
-            adb[ctype] += 1
-            # print(adb)
-            db["cats"].update({a: adb})
-            db.save("cats")
-            await message.delete()
-            cmsg = setup_tasks[cid].current_msg
-            if cmsg is not None:
-                await cmsg.delete()
-                setup_tasks[cid].cat_active = False
-            emoji = nc.utils.get(message.guild.emojis, name=ctype + "cat")
-            dn = message.author.global_name
-            # print("Display name:", dn)
-            if dn == "@everyone" or dn == "@here":
-                dn = "YouTried"
-            await message.channel.send(
-                f" \
-{dn} cought {emoji} {ctype.capitalize()} cat!!!!1!\n\
-You now have {adb[ctype]} cats of dat type!!!\n\
-this fella was cought in (uhh idk) seconds!!!!"
-            )
-            db["cattype"][str(gid)][str(cid)] = "none"
+        await catch_cb(message, gid, cid, adb, setup_tasks, a)
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")
@@ -149,7 +88,31 @@ this fella was cought in (uhh idk) seconds!!!!"
     await handle_ach(message, c, message.author)
 
 
-# @bot.slash_command('say', 'make the bot say something')
-# async def say(interaction: nc.Interaction, what: str): await cmd_say(interaction, what)
+# endregion
+
+# region Slash Commands
+
+
+@bot.slash_command("setup", "setup the bot")
+async def setup(interaction: nc.Interaction):
+    await setup_cb(interaction, setup_tasks)
+
+
+@bot.slash_command("forget", "i forgor :skull: (unsetup)")
+async def forgor(interaction: nc.Interaction):
+    await forget_cb(interaction, setup_tasks)
+
+
+@bot.slash_command("inventory", "see your or other's inventory")
+async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
+    await inventory_cb(interaction, person, bot)
+
+
+@bot.slash_command("achivements", "see how many achivements you have")
+async def achivement(interaction: nc.Interaction):
+    await achivement_cb(interaction)
+
+
+# endregion
 
 bot.run(read_file("dev/TOKEN.txt"))

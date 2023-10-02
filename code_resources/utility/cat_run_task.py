@@ -1,5 +1,6 @@
 from asyncio import Task, create_task, sleep
 from random import randint, random
+from time import time
 from typing import TypedDict
 
 from discord import File, Guild, Message, TextChannel
@@ -146,6 +147,11 @@ class CatLoop:
                 self.cat_active = True
                 emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
                 db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
+                # db["times"][str(self.guild.id)][str(self.channel.id)] = time()
+                if db["times"].get(self.guild.id) is None:
+                    db["times"][self.guild.id] = {}
+                db["times"][self.guild.id][self.channel.id] = time()
+                db.save('times')
                 self.current_msg = await self.channel.send(
                     f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
                     file=File("code_resources/staring.png"),
