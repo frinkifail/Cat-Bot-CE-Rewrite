@@ -71,8 +71,10 @@ async def forgor(interaction: nc.Interaction):
     cid = interaction.channel.id
     gid = interaction.guild.id
     try:
+        db.reload("cscwg")
         setup_tasks[cid].running = False
-        db["cscwg"][gid].remove(cid)
+        # print(db['cscwg'])
+        db["cscwg"][str(gid)].remove(cid)
         db.save("cscwg")
         await interaction.send(
             f"share if you have dementia (successfully forgort this channel)"

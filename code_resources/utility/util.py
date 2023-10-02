@@ -124,7 +124,21 @@ class JsonLoadedDict(dict):
         return tevcnoio(self[dbkey].get(str(uid)), str(uid), default, self)
 
 
+class TimingsJSON(dict):
+    def save(self):
+        save_json(self, "data/timings.json")
+        print("> Save successful")
+
+    def reload(self):
+        for k, v in load_json("data/timings.json").items():
+            k: int  # {guildid: {channelid: timing}}
+            v: dict[int, float]
+            self[k] = v
+        return self
+
+
 db = JsonLoadedDict()
+timings = TimingsJSON()
 
 
 # the most pain of shit but thanks anyway
