@@ -1,4 +1,4 @@
-#!/Users/waadna/.pyenv/shims/python
+#!python
 from os import execv
 from sys import argv, executable
 from typing import Any, Optional
