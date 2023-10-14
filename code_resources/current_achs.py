@@ -1,13 +1,7 @@
 from .achivements import AchivementManager
 
 achivements = {
-    "testing": AchivementManager.new(
-        "exact", phrase="devtest", description='Say "devtest"'
-    ),
-    "testing episode 2": AchivementManager.new(
-        "includes", phrase="cat", description='Have a "cat" in your message.'
-    ),
-    "testing episode 3": AchivementManager.new(
-        "exact", phrase="this is a very hidden message", hidden=True
-    ),
+    "i like pies": AchivementManager.new(
+        "pi catch", "external", description="catch a cat in 3.14 seconds"
+    )
 }

@@ -130,31 +130,34 @@ class CatLoop:
             if (
                 30 <= spawn_cat_or_no <= 95 and not self.cat_active
             ):  # yay we spawn cat now
-                cat_type = "fine"
-                chance = random() * 100
-                for k, c in cat_chances.items():
-                    # So, why didn't just use type: ignore the first time you may ask?
-                    # Because, uhm
-                    # haha typecheck go brrrrr
-                    try:
-                        # shuddup pyright
-                        v = float(c)  # type: ignore
-                    except ValueError as e:
-                        print(f"[ERROR] Error in loop {self.id}: {e}")
-                        v = -1.0
-                    if chance < v:
-                        cat_type = k
-                if cat_type == "_8bit":
-                    cat_type = "8bit"
-                self.cat_active = True
-                emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
-                db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
-                # db["times"][str(self.guild.id)][str(self.channel.id)] = time()
-                if db["times"].get(self.guild.id) is None:
-                    db["times"][self.guild.id] = {}
-                db["times"][self.guild.id][self.channel.id] = time()
-                db.save("times")
-                self.current_msg = await self.channel.send(
-                    f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
-                    file=File("code_resources/staring.png"),
-                )
+                await self.spawn()
+
+    async def spawn(self):
+        cat_type = "fine"
+        chance = random() * 100
+        for k, c in cat_chances.items():
+            # So, why didn't just use type: ignore the first time you may ask?
+            # Because, uhm
+            # haha typecheck go brrrrr
+            try:
+                # shuddup pyright
+                v = float(c)  # type: ignore
+            except ValueError as e:
+                print(f"[ERROR] Error in loop {self.id}: {e}")
+                v = -1.0
+            if chance < v:
+                cat_type = k
+        if cat_type == "_8bit":
+            cat_type = "8bit"
+        self.cat_active = True
+        emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
+        db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
+        # db["times"][str(self.guild.id)][str(self.channel.id)] = time()
+        if db["times"].get(self.guild.id) is None:
+            db["times"][self.guild.id] = {}
+        db["times"][self.guild.id][self.channel.id] = time()
+        db.save("times")
+        self.current_msg = await self.channel.send(
+            f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
+            file=File("code_resources/staring.png"),
+        )
