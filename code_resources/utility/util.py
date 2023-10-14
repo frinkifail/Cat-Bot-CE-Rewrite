@@ -35,6 +35,8 @@ def init_data():
             create_file("data/cscwg.json", "{}")
         if not path.exists("data/achs.json"):
             create_file("data/achs.json", "{}")
+        if not path.exists("data/times.json"):
+            create_file("data/times.json", "{}")
 
     if not path.exists("data"):
         mkdir("data")
@@ -124,6 +126,19 @@ class JsonLoadedDict(dict):
 
     def uget(self, uid: int, dbkey: DBKeys, gid: int = 0, default: Any = {}):
         return tevcnoio(self[dbkey].get(str(uid)), str(uid), default, self)
+
+
+class TimingsJSON(dict):
+    def save(self):
+        save_json(self, "data/timings.json")
+        print("> Save successful")
+
+    def reload(self):
+        for k, v in load_json("data/timings.json").items():
+            k: int  # {guildid: {channelid: timing}}
+            v: dict[int, float]
+            self[k] = v
+        return self
 
 
 class TimingsJSON(dict):

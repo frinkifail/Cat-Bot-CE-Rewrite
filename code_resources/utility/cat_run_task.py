@@ -1,11 +1,12 @@
 from asyncio import Task, create_task, sleep
 from random import randint, random
+from time import time
 from typing import TypedDict
 
 from discord import File, Guild, Message, TextChannel
 from discord.utils import get
 
-from code_resources.utility.util import load_json, db, timings
+from code_resources.utility.util import load_json, db, timings, timings
 
 # region Cat Chances
 # Modify the `TypedDict` containing chances types to add new cats.
@@ -106,6 +107,8 @@ class CatLoop:
     async def _loop(self):
         # Get JSON data from 'data/timings.json' and get the value of key {self.guild_id}
         # json_data: dict[int, float] = load_json("data/timings.json")
+        data: float = timings.reload().get(self.guild.id, {}).get(self.channel.id, 5)
+        # json_data: dict[int, float] = load_json("data/timings.json")
         data = timings.get(self.guild.id)[self.channel.id]
         if data is None:
             print(
@@ -113,15 +116,10 @@ class CatLoop:
             )
             # await self.channel.send("No timing set, using 2 seconds.")
             data = 5
-            # The code below completely breaks
-            # I have no clue why
             # db["timings"][self.guild.id][self.channel.id] = 5
-            # timing: dict[int, float] = db["timings"].get(self.guild.id)
-            # timing[self.channel.id] = 5
-            # db["timings"][self.guild.id] = timing
+            # timings.get(self.guild.id, {})[self.channel.id] = 5
             # db.save("timings")
-            timings.get(self.guild.id)[self.channel.id] = 5
-
+            timings.save()
         print(f"ok opened loop for {self.id}")
         while True:
             if not self.running:
@@ -151,6 +149,11 @@ class CatLoop:
                 self.cat_active = True
                 emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
                 db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
+                # db["times"][str(self.guild.id)][str(self.channel.id)] = time()
+                if db["times"].get(self.guild.id) is None:
+                    db["times"][self.guild.id] = {}
+                db["times"][self.guild.id][self.channel.id] = time()
+                db.save("times")
                 self.current_msg = await self.channel.send(
                     f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
                     file=File("code_resources/staring.png"),
