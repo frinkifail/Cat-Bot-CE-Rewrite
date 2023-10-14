@@ -5,7 +5,7 @@ from typing import TypedDict
 from discord import File, Guild, Message, TextChannel
 from discord.utils import get
 
-from code_resources.utility.util import load_json, db
+from code_resources.utility.util import load_json, db, timings
 
 # region Cat Chances
 # Modify the `TypedDict` containing chances types to add new cats.
@@ -105,18 +105,25 @@ class CatLoop:
 
     async def _loop(self):
         # Get JSON data from 'data/timings.json' and get the value of key {self.guild_id}
-        json_data: dict[int, float] = load_json("data/timings.json")
-        data = json_data.get(self.guild.id)
+        # json_data: dict[int, float] = load_json("data/timings.json")
+        data = timings.get(self.guild.id)[self.channel.id]
         if data is None:
             print(
                 "[WARNING] This guild doesn't have a timing data key. Defaulting to 5."
             )
             # await self.channel.send("No timing set, using 2 seconds.")
             data = 5
-            db["timings"][self.guild.id][self.channel.id] = 5
+            # The code below completely breaks
+            # I have no clue why
+            # db["timings"][self.guild.id][self.channel.id] = 5
+            # timing: dict[int, float] = db["timings"].get(self.guild.id)
+            # timing[self.channel.id] = 5
+            # db["timings"][self.guild.id] = timing
             # db.save("timings")
+            timings.get(self.guild.id)[self.channel.id] = 5
+
         print(f"ok opened loop for {self.id}")
-        while self.running:
+        while True:
             if not self.running:
                 print(f"oki closing loop for {self.id}")
                 break

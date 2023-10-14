@@ -95,6 +95,8 @@ def update_json(
 # region New DB Stuff
 class JsonLoadedDict(dict):
     def __getitem__(self, key: str | int) -> Any:
+        if key == "timings":
+            raise UserWarning("DB > Use TimingJSON instead.")
         try:
             return super().__getitem__(key)
         except KeyError:
@@ -124,7 +126,25 @@ class JsonLoadedDict(dict):
         return tevcnoio(self[dbkey].get(str(uid)), str(uid), default, self)
 
 
+class TimingsJSON(dict):
+    def __setitem__(self, key: Any, value: Any) -> None:
+        super().__setitem__(key, value)
+        save_json(self, "data/timings.json")
+
+    def __getitem__(self, key: Any) -> Any:
+        self = load_json("data/timings.json")
+        return super().__getitem__(key)
+
+    def get(self, guild: int) -> dict[int, float]:
+        try:
+            return self[guild]
+        except KeyError:
+            self[guild] = {}
+            return {}
+
+
 db = JsonLoadedDict()
+timings = TimingsJSON()
 
 
 # the most pain of shit but thanks anyway
