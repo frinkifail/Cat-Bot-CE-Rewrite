@@ -109,7 +109,7 @@ class CatLoop:
         # json_data: dict[int, float] = load_json("data/timings.json")
         data: float = timings.reload().get(self.guild.id, {}).get(self.channel.id, 5)
         # json_data: dict[int, float] = load_json("data/timings.json")
-        data = timings.get(self.guild.id)[self.channel.id]
+        # data = timings.get(self.guild.id)[self.channel.id]
         if data is None:
             print(
                 "[WARNING] This guild doesn't have a timing data key. Defaulting to 5."
