@@ -43,8 +43,7 @@ async def on_ready():
         if isinstance(catbot_channel, nc.TextChannel):
             await catbot_channel.send("oki i restarted")
         if setup_tasks.__len__() == 0:
-            # for i in db
-            # TODO: setup for everything in db[cscwg]
+            # TODO (Complete): setup for everything in db[cscwg]
             for k, v in db["cscwg"].items():
                 k: int  # Explicit typing
                 v: list[int]

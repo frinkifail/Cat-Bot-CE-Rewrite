@@ -123,7 +123,7 @@ class JsonLoadedDict(dict):
             dump(self.get(key), f)
 
     def uget(self, uid: int, dbkey: DBKeys, gid: int = 0, default: Any = {}):
-        return tevcnoio(self[dbkey].get(str(uid)), str(uid), default, self)
+        return tevcnoio(str(uid), default, self[dbkey])
 
 
 class TimingsJSON(dict):
@@ -145,7 +145,8 @@ timings = TimingsJSON()
 
 # the most pain of shit but thanks anyway
 # Try Except Value Create New Object In Object
-def tevcnoio(value: Any | None, key: str | int, new_object: Any, in_object: dict):
+def tevcnoio(key: str | int, new_object: Any, in_object: dict):
+    value = in_object.get(key)
     if value is None:
         in_object.__setitem__(key, new_object)
         return new_object

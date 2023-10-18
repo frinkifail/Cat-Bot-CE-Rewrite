@@ -6,7 +6,7 @@ from typing import TypedDict
 from discord import File, Guild, Message, TextChannel
 from discord.utils import get
 
-from code_resources.utility.util import load_json, db, timings
+from .util import db, tevcnoio, timings
 
 # region Cat Chances
 # Modify the `TypedDict` containing chances types to add new cats.
@@ -126,7 +126,11 @@ class CatLoop:
             await sleep(data)
             spawn_cat_or_no = randint(0, 100)
             if (
-                30 <= spawn_cat_or_no <= 95 and not self.cat_active
+                30 <= spawn_cat_or_no <= 95
+                and not self.cat_active
+                and not db["cat active"]
+                .get(self.guild.id, {})
+                .get(self.channel.id, False)
             ):  # yay we spawn cat now
                 cat_type = "fine"
                 chance = random() * 100
@@ -151,7 +155,11 @@ class CatLoop:
                 if db["times"].get(self.guild.id) is None:
                     db["times"][self.guild.id] = {}
                 db["times"][self.guild.id][self.channel.id] = time()
-                db.save('times')
+                tevcnoio(self.guild.id, {}, db["cat active"]).__setitem__(
+                    self.channel.id, True
+                )
+                db.save("cat active")
+                db.save("times")
                 self.current_msg = await self.channel.send(
                     f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
                     file=File("code_resources/staring.png"),
