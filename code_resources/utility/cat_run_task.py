@@ -6,7 +6,7 @@ from typing import TypedDict
 from discord import File, Guild, Message, TextChannel
 from discord.utils import get
 
-from .util import db, tevcnoio, timings
+from .util import db, timings
 
 # region Cat Chances
 # Modify the `TypedDict` containing chances types to add new cats.
@@ -108,6 +108,8 @@ class CatLoop:
         # Get JSON data from 'data/timings.json' and get the value of key {self.guild_id}
         # json_data: dict[int, float] = load_json("data/timings.json")
         data: float = timings.reload().get(self.guild.id, {}).get(self.channel.id, 5)
+        # json_data: dict[int, float] = load_json("data/timings.json")
+        # data = timings.get(self.guild.id)[self.channel.id]
         if data is None:
             print(
                 "[WARNING] This guild doesn't have a timing data key. Defaulting to 5."
@@ -119,7 +121,7 @@ class CatLoop:
             # db.save("timings")
             timings.save()
         print(f"ok opened loop for {self.id}")
-        while self.running:
+        while True:
             if not self.running:
                 print(f"oki closing loop for {self.id}")
                 break
@@ -155,10 +157,6 @@ class CatLoop:
                 if db["times"].get(self.guild.id) is None:
                     db["times"][self.guild.id] = {}
                 db["times"][self.guild.id][self.channel.id] = time()
-                tevcnoio(self.guild.id, {}, db["cat active"]).__setitem__(
-                    self.channel.id, True
-                )
-                db.save("cat active")
                 db.save("times")
                 self.current_msg = await self.channel.send(
                     f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',

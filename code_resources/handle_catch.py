@@ -2,6 +2,7 @@ from time import time
 from typing import Any
 from discord import Message
 from nextcord.utils import get
+from code_resources.achivements import AchivementManager
 
 from .utility.cat_run_task import CatLoop
 from .utility.util import tevcnoio, db
@@ -11,7 +12,7 @@ async def catch_cb(
     message: Message,
     gid: int,
     cid: int,
-    adb: dict[str, Any],
+    adb: dict[str, int],
     setup_tasks: dict[int, CatLoop],
     a: int,
 ):
@@ -44,6 +45,10 @@ async def catch_cb(
         )
         if isinstance(timing, float) and timing < 0:
             timing = "undefined"
+        if timing == 3.14:
+            await AchivementManager.unlock_send(
+                message, db.uget(a, "achs"), message.author, "pi catch"
+            )
         await message.channel.send(
             f" \
 {dn} cought {emoji} {ctype.capitalize()} cat!!!!1!\n\

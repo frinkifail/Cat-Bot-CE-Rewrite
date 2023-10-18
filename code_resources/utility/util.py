@@ -97,6 +97,8 @@ def update_json(
 # region New DB Stuff
 class JsonLoadedDict(dict):
     def __getitem__(self, key: str | int) -> Any:
+        if key == "timings":
+            raise UserWarning("DB > Use TimingJSON instead.")
         try:
             return super().__getitem__(key)
         except KeyError:

@@ -10,6 +10,7 @@ from code_resources.command_inventory import inventory_cb
 from code_resources.command_setup import setup_cb
 from code_resources.handle_achs import handle_ach
 from code_resources.handle_catch import catch_cb
+from code_resources.handle_debug import handle_debug
 from code_resources.utility.cat_run_task import CatLoop
 from code_resources.utility.util import (
     db,
@@ -26,7 +27,7 @@ cscwg: dict[
     int, list[int]
 ] = {}  # Current Setup Channels With Guild # {GuildID: [ChannelID, ...]}
 
-RESTART_LOG = 1154694509494550568
+RESTART_LOG = 1151851013637152859
 
 # region Events
 
@@ -83,7 +84,12 @@ async def on_message(message: nc.Message):
                 print("cat type is none lol")
             execv(executable, ["python"] + argv)
         else:
-            await message.reply("skill issue")
+            await message.reply("restart failed: not bot owner")
+    if c.startswith("kat>"):
+        if message.author.name == "frinkifail":
+            await handle_debug(c.split("kat>", 1)[0])
+        else:
+            await message.reply("debug command failed: not bot owner")
     await handle_ach(message, c, message.author)
 
 
@@ -110,6 +116,31 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
 @bot.slash_command("achivements", "see how many achivements you have")
 async def achivement(interaction: nc.Interaction):
     await achivement_cb(interaction)
+
+
+@bot.slash_command(
+    "forcespawn", "i mean, pretty self-explanatory. it just spawns a cat"
+)
+async def forcespawn(interaction: nc.Interaction, force: bool = False):
+    if (
+        not isinstance(interaction.channel, nc.TextChannel)
+        or not interaction.channel_id
+        or not interaction.guild
+        or not interaction.guild_id
+    ):
+        await interaction.send("ong seriously")
+        return
+    catloop = setup_tasks.get(interaction.channel_id)
+    if catloop is None:
+        await interaction.send("this channel isn't even setup")
+        return
+    if catloop.cat_active and not force:
+        await interaction.send(
+            "there's already a cat sitting around; if there's no cat; use the `force` parameter."
+        )
+        return
+    await catloop.spawn()
+    await interaction.send("done!")
 
 
 # endregion
