@@ -1,7 +1,7 @@
 from typing import Literal, TypeAlias, TypedDict, TYPE_CHECKING
 from .util import db
 
-from nextcord import User, Message, Member
+from nextcord import Color, Embed, User, Message, Member
 from nextcord import TextChannel
 
 UnlockedUsing: TypeAlias = Literal["exact", "includes", "external"]
@@ -54,17 +54,15 @@ class AchivementManager:
             success = AchivementManager.unlock(adb[ach_name], str(user))
         if isinstance(message.channel, TextChannel):
             if success:
-                await message.channel.send(
-                    f"{user.global_name} just unlocked {ach_name}!"
+                embed = Embed(
+                    color=Color.green(), title="Achievement Unlocked"
+                ).add_field(
+                    name="", value=f"{user.global_name} just unlocked {ach_name}!"
                 )
-            else:
-                if user.dm_channel is not None:
-                    await user.dm_channel.send(f"you already unlocked {ach_name}")
-                else:
-                    await message.reply(
-                        f"you already unlocked {ach_name}"
-                    )  # haha out for everyone to see!!
-                    # and yes, i do know how to use `User|Member#create_dm`, I'm just too lazy.
+                # await message.channel.send(
+                #     f"{user.global_name} just unlocked {ach_name}!"
+                # )
+                await message.channel.send(embed=embed)
         else:
             print("oh, interaction.channel isn't a textchannel...\nthat's a shame.")
         db["achs"].update({str(user.id): adb})
