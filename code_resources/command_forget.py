@@ -19,5 +19,5 @@ async def forget_cb(interaction: Interaction, setup_tasks: dict[int, CatLoop]):
         await interaction.send(
             f"share if you have dementia (successfully forgort this channel)"
         )
-    except KeyError or ValueError:
+    except ValueError:
         await interaction.send(f"{interaction.channel} isn't setup yet")
