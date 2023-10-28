@@ -18,6 +18,7 @@ async def setup_cb(interaction: Interaction, setup_tasks: dict[int, CatLoop]):
     if setup_tasks.get(cid) is not None:
         setup_tasks[cid] = CatLoop(interaction.channel, interaction.guild, 0)
         success = await setup_tasks[cid].start()
+        await setup_tasks[cid].spawn()  # incase something goes wrong or smth
         if not success:
             await interaction.send("what how")
             return
