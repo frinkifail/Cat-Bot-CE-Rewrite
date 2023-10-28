@@ -1,7 +1,7 @@
 from time import time
 from discord import Message
 from nextcord.utils import get
-from code_resources.utility.achivements import AchivementManager
+from .utility.achivements import AchivementManager
 
 from .utility.cat_run_task import CatLoop
 from .utility.util import tevcnoio, db
@@ -18,8 +18,14 @@ async def catch_cb(
     if gid == 0 or message.guild is None:
         await message.reply("sureeeeee")
         return
-    ctype_guild = tevcnoio(str(gid), {}, db["cattype"])
-    ctype: str = tevcnoio(str(cid), "none", ctype_guild)
+    # ctype_guild = tevcnoio(str(gid), {}, db["cattype"])
+    # ctype: str = tevcnoio(str(cid), "none", ctype_guild)
+    if db["cattype"].get(str(gid)) is None:
+        db["cattype"][str(gid)] = {}
+    if db["cattype"][str(gid)].get(str(cid)) is None:
+        ctype = "none"
+    else:
+        ctype = db["cattype"][str(gid)][str(cid)]
     if ctype == "none":
         await message.reply("har har har you said cat")
     else:

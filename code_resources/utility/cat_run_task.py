@@ -107,7 +107,7 @@ class CatLoop:
     async def _loop(self):
         # Get JSON data from 'data/timings.json' and get the value of key {self.guild_id}
         # json_data: dict[int, float] = load_json("data/timings.json")
-        data: float = timings.reload().get(self.guild.id, {}).get(self.channel.id, 5)
+        data: float = timings.reload().get(self.guild.id, {}).get(self.channel.id)
         # json_data: dict[int, float] = load_json("data/timings.json")
         # data = timings.get(self.guild.id)[self.channel.id]
         if data is None:
@@ -119,6 +119,9 @@ class CatLoop:
             # db["timings"][self.guild.id][self.channel.id] = 5
             # timings.get(self.guild.id, {})[self.channel.id] = 5
             # db.save("timings")
+            if not timings.get(self.guild.id):
+                timings[self.guild.id] = {}
+            timings[self.guild.id][self.channel.id] = 5
             timings.save()
         print(f"ok opened loop for {self.id}")
         while True:
