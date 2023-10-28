@@ -1,7 +1,7 @@
 from discord import Color, Embed, Interaction
 from .utility.util import db
-from .achivements import Achivement, AchivementManager
-from .current_achs import achivements
+from .utility.achivements import Achivement, AchivementManager
+from .utility.current_achs import achivements
 
 
 async def achivement_cb(interaction: Interaction):
@@ -33,6 +33,7 @@ async def achivement_cb(interaction: Interaction):
             unlock_str = check_lock(ach)
         else:
             adb[k] = AchivementManager.new(
+                v["id"],
                 v["unlocked_using"],
                 v["unlocked"],
                 v["unlocked_by"],

@@ -1,10 +1,7 @@
 from typing import Literal, TypeAlias, TypedDict, TYPE_CHECKING
-from typing_extensions import NotRequired
-from .utility.util import db
-from .current_achs import achivements
+from .util import db
 
-if TYPE_CHECKING:
-    from nextcord import User, Message, Member
+from nextcord import User, Message, Member
 from nextcord import TextChannel
 
 UnlockedUsing: TypeAlias = Literal["exact", "includes", "external"]
@@ -38,6 +35,8 @@ class AchivementManager:
         user: User | Member,
         ach_name: str,
     ):
+        from .current_achs import achivements
+
         ach = adb.get(ach_name)
         if ach is not None:
             success = AchivementManager.unlock(ach, str(user))

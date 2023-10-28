@@ -1,6 +1,6 @@
-from discord import Interaction, Permissions, TextChannel
+from discord import Interaction, TextChannel
 from .utility.cat_run_task import CatLoop
-from .utility.util import db, tevcnoio
+from .utility.util import db
 
 
 async def setup_cb(interaction: Interaction, setup_tasks: dict[int, CatLoop]):

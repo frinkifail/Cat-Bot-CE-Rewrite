@@ -1,8 +1,8 @@
 from discord import Member, Message, TextChannel, User
 
-from .achivements import Achivement, AchivementManager, UnlockedUsing
+from .utility.achivements import Achivement, AchivementManager, UnlockedUsing
 from .utility.util import db
-from .current_achs import achivements
+from .utility.current_achs import achivements
 
 
 async def handle_ach(message: Message, msg: str, user: User | Member):
