@@ -24,6 +24,9 @@ async def setup_cb(interaction: Interaction, setup_tasks: dict[int, CatLoop]):
             return
     if db["cscwg"].get(gid) is None:
         db["cscwg"][gid] = []
+    if cid in db["cscwg"][gid]:
+        await message.edit(f"you dumb this channel is already setup")
+        return
     db["cscwg"][gid].append(cid)
     db.save("cscwg")
     await message.edit(f"oki! i will now send cats in #{interaction.channel.name}!")

@@ -18,6 +18,18 @@ cscwg: dict[
 RESTART_LOG = 1151851013637152859
 OWNER_USERNAME = "frinkifail"
 
+# region Simple Utility Functions
+
+
+def save_cat_type():
+    if cr.db["cattype"] is not None:
+        cr.db.save("cattype")
+    else:
+        print("cat type is none lol")
+
+
+# endregion
+
 # region Events
 
 
@@ -45,6 +57,7 @@ async def on_ready():
                 for i in channels:
                     if isinstance(i, nc.TextChannel):
                         setup_tasks[i.id] = cr.CatLoop(i, guild, 0)
+                        setup_tasks[i.id].cat_active = cr.db["cattype"][k][i.id]
                         await setup_tasks[i.id].start()
     else:
         print("Not logged in (how?)")
@@ -67,10 +80,7 @@ async def on_message(message: nc.Message):
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")
-            if cr.db["cattype"] is not None:
-                cr.db.save("cattype")
-            else:
-                print("cat type is none lol")
+
             execv(executable, ["python"] + argv)
         else:
             await message.reply("restart failed: not bot owner")
@@ -80,13 +90,23 @@ async def on_message(message: nc.Message):
             admin = True
         else:
             admin = False
-        await cr.handle_debug(bot, message, admin, d[0], d[1].split())
+        try:
+            await cr.handle_debug(bot, message, admin, d[0], d[1].split())
+        except IndexError:
+            await cr.handle_debug(bot, message, admin, d[0], [])
     await cr.handle_ach(message, c, message.author)
+
+
+@bot.event
+async def on_disconnect():
+    print("> disconnecting")
+    save_cat_type()
 
 
 # endregion
 
 # region Slash Commands
+# region Split Commands
 
 
 @bot.slash_command("setup", "setup the bot")
@@ -107,6 +127,10 @@ async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
 @bot.slash_command("achivements", "see how many achivements you have")
 async def achivement(interaction: nc.Interaction):
     await cr.achivement_cb(interaction)
+
+
+# endregion
+# region Unsplit Commands
 
 
 @bot.slash_command(
@@ -133,6 +157,8 @@ async def forcespawn(interaction: nc.Interaction, force: bool = False):
     await catloop.spawn()
     await interaction.send("done!")
 
+
+# endregion
 
 # endregion
 
