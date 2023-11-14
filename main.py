@@ -61,7 +61,7 @@ async def on_message(message: nc.Message):
     if bot.user is not None:
         if a == bot.user.id:
             return
-    if c == "cat":
+    if c.lower() == "cat":
         adb: dict[str, Any] = cr.db.uget(a, "cats")
         await cr.catch_cb(message, gid, cid, adb, setup_tasks, a)
     if c == "r":
