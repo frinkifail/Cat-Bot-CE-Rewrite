@@ -1,3 +1,4 @@
+from __future__ import annotations
 from random import choice
 from typing import TYPE_CHECKING
 from git import Repo
@@ -33,7 +34,7 @@ PING_SPLASHES = [
 
 
 async def handle_debug(
-    bot: Bot, msg: Message, is_owner: bool, command: str, args: list[str]
+    bot: "Bot", msg: "Message", is_owner: bool, command: str, args: list[str]
 ):
     if command == "ping":
         repo = Repo(search_parent_directories=True)
