@@ -4,25 +4,13 @@ from sys import argv, executable
 from typing import Any, Optional
 import nextcord as nc
 from nextcord.ext import commands
-from code_resources.command_achivement import achivement_cb
-from code_resources.command_forget import forget_cb
-from code_resources.command_inventory import inventory_cb
-from code_resources.command_setup import setup_cb
-from code_resources.handle_achs import handle_ach
-from code_resources.handle_catch import catch_cb
-from code_resources.handle_debug import handle_debug
-from code_resources.utility.cat_run_task import CatLoop
-from code_resources.utility.util import (
-    db,
-    init_data,
-    read_file,
-)
+import code_resources as cr
 
-init_data()
+cr.init_data()
 
 bot = commands.Bot(intents=nc.Intents.all())
 
-setup_tasks: dict[int, CatLoop] = {}  # ChannelID: Loop
+setup_tasks: dict[int, cr.CatLoop] = {}  # ChannelID: Loop
 cscwg: dict[
     int, list[int]
 ] = {}  # Current Setup Channels With Guild # {GuildID: [ChannelID, ...]}
@@ -45,7 +33,7 @@ async def on_ready():
             await catbot_channel.send("oki i restarted")
         if setup_tasks.__len__() == 0:
             # TODO (Complete): setup for everything in db[cscwg]
-            for k, v in db["cscwg"].items():
+            for k, v in cr.db["cscwg"].items():
                 k: int  # Explicit typing
                 v: list[int]
                 guild = await bot.fetch_guild(k)
@@ -55,7 +43,7 @@ async def on_ready():
                     channels.append(channel)
                 for i in channels:
                     if isinstance(i, nc.TextChannel):
-                        setup_tasks[i.id] = CatLoop(i, guild, 0)
+                        setup_tasks[i.id] = cr.CatLoop(i, guild, 0)
                         await setup_tasks[i.id].start()
     else:
         print("Not logged in (how?)")
@@ -69,17 +57,17 @@ async def on_message(message: nc.Message):
         message.guild.id if message.guild else 0
     )  # smhhhh null checks for example they send in dms or smthhhh
     cid = message.channel.id
-    adb: dict[str, Any] = db.uget(a, "cats")
+    adb: dict[str, Any] = cr.db.uget(a, "cats")
     if bot.user is not None:
         if a == bot.user.id:
             return
     if c == "cat":
-        await catch_cb(message, gid, cid, adb, setup_tasks, a)
+        await cr.catch_cb(message, gid, cid, adb, setup_tasks, a)
     if c == "r":
         if message.author.name == "frinkifail":
             await message.reply("oki restarting")
-            if db["cattype"] is not None:
-                db.save("cattype")
+            if cr.db["cattype"] is not None:
+                cr.db.save("cattype")
             else:
                 print("cat type is none lol")
             execv(executable, ["python"] + argv)
@@ -87,10 +75,10 @@ async def on_message(message: nc.Message):
             await message.reply("restart failed: not bot owner")
     if c.startswith("kat>"):
         if message.author.name == "frinkifail":
-            await handle_debug(c.split("kat>", 1)[0])
+            await cr.handle_debug(c.split("kat>", 1)[0])
         else:
             await message.reply("debug command failed: not bot owner")
-    await handle_ach(message, c, message.author)
+    await cr.handle_ach(message, c, message.author)
 
 
 # endregion
@@ -100,22 +88,22 @@ async def on_message(message: nc.Message):
 
 @bot.slash_command("setup", "setup the bot")
 async def setup(interaction: nc.Interaction):
-    await setup_cb(interaction, setup_tasks)
+    await cr.setup_cb(interaction, setup_tasks)
 
 
 @bot.slash_command("forget", "i forgor :skull: (unsetup)")
 async def forgor(interaction: nc.Interaction):
-    await forget_cb(interaction, setup_tasks)
+    await cr.forget_cb(interaction, setup_tasks)
 
 
 @bot.slash_command("inventory", "see your or other's inventory")
 async def inventory(interaction: nc.Interaction, person: Optional[nc.User]):
-    await inventory_cb(interaction, person, bot)
+    await cr.inventory_cb(interaction, person, bot)
 
 
 @bot.slash_command("achivements", "see how many achivements you have")
 async def achivement(interaction: nc.Interaction):
-    await achivement_cb(interaction)
+    await cr.achivement_cb(interaction)
 
 
 @bot.slash_command(
@@ -145,4 +133,4 @@ async def forcespawn(interaction: nc.Interaction, force: bool = False):
 
 # endregion
 
-bot.run(read_file("dev/TOKEN.txt"))
+bot.run(cr.read_file("dev/TOKEN.txt"))
