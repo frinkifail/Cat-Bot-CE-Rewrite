@@ -57,7 +57,9 @@ async def on_ready():
                 for i in channels:
                     if isinstance(i, nc.TextChannel):
                         setup_tasks[i.id] = cr.CatLoop(i, guild, 0)
-                        setup_tasks[i.id].cat_active = cr.db["cattype"][k][i.id]
+                        setup_tasks[i.id].cat_active = cr.db["cat active"][str(k)][
+                            str(i.id)
+                        ]
                         await setup_tasks[i.id].start()
     else:
         print("Not logged in (how?)")

@@ -158,12 +158,14 @@ class CatLoop:
             cat_type = "8bit"
         self.cat_active = True
         emoji = get(self.guild.emojis, name=cat_type.lower() + "cat")
+        db["cat active"][str(self.guild.id)][str(self.channel.id)] = True
         db["cattype"][str(self.guild.id)][str(self.channel.id)] = cat_type
         # db["times"][str(self.guild.id)][str(self.channel.id)] = time()
         if db["times"].get(self.guild.id) is None:
             db["times"][self.guild.id] = {}
         db["times"][self.guild.id][self.channel.id] = time()
         db.save("times")
+        db.save("cat active")
         self.current_msg = await self.channel.send(
             f'{emoji} A {cat_type.capitalize()} cat appeared! Type "cat" to catch it!',
             file=File("code_resources/staring.png"),

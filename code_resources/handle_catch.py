@@ -26,7 +26,8 @@ async def catch_cb(
         ctype = "none"
     else:
         ctype = db["cattype"][str(gid)][str(cid)]
-    if ctype == "none":
+    cat_active: bool = db["cat active"][str(gid)][str(cid)]
+    if ctype == "none" or cat_active == False:
         await message.reply("har har har you said cat")
     else:
         db.reload("times")
