@@ -16,6 +16,7 @@ cscwg: dict[
 ] = {}  # Current Setup Channels With Guild # {GuildID: [ChannelID, ...]}
 
 RESTART_LOG = 1151851013637152859
+OWNER_USERNAME = "frinkifail"
 
 # region Events
 
@@ -57,11 +58,11 @@ async def on_message(message: nc.Message):
         message.guild.id if message.guild else 0
     )  # smhhhh null checks for example they send in dms or smthhhh
     cid = message.channel.id
-    adb: dict[str, Any] = cr.db.uget(a, "cats")
     if bot.user is not None:
         if a == bot.user.id:
             return
     if c == "cat":
+        adb: dict[str, Any] = cr.db.uget(a, "cats")
         await cr.catch_cb(message, gid, cid, adb, setup_tasks, a)
     if c == "r":
         if message.author.name == "frinkifail":
@@ -74,10 +75,12 @@ async def on_message(message: nc.Message):
         else:
             await message.reply("restart failed: not bot owner")
     if c.startswith("kat>"):
-        if message.author.name == "frinkifail":
-            await cr.handle_debug(c.split("kat>", 1)[0])
+        d = c.replace("kat>", "").split(maxsplit=2)
+        if message.author.name == OWNER_USERNAME:
+            admin = True
         else:
-            await message.reply("debug command failed: not bot owner")
+            admin = False
+        await cr.handle_debug(bot, message, admin, d[0], d[1].split())
     await cr.handle_ach(message, c, message.author)
 
 
